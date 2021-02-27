@@ -66,6 +66,7 @@
 
     <!-- <form id="mainForm" action=""> -->
       <input id="inputName" type="text"/>
+      <input id="inputPass" type="password"/>
     <!-- </form> -->
 
     <button id="logInSignUp">Login/SignUp</button>
@@ -86,6 +87,7 @@
     var input = document.getElementById('input');
     var logInSignUp = document.getElementById('logInSignUp');
     var inputName = document.getElementById('inputName');
+    var inputPass = document.getElementById('inputPass');
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -96,7 +98,7 @@
     });
 
     logInSignUp.addEventListener("click", (e) =>{
-      socket.emit('signLogIn', inputName.innerText);
+      socket.emit('signLogIn', {name: inputName.value, pass: inputPass.value});
     });
 
     socket.on('chat message', function (msg) {
