@@ -37,14 +37,14 @@ io.on('connection', (socket) => {
   
   socket.on('logIn', (userInfo) => {
     //DONE: login the user if already exist 
-    //UNFIN: with correct credentials (name and pass).
+    //DONE: if with correct credentials (name and pass).
 
     //DONE: Search for the incoming user in the list of all user
     var findUser = allChatUsers.filter(e => e.name == userInfo.name);
 
-    //If username found on list
+    //DONE: If username found on list
     if(findUser.length > 0){
-      //and password is correct
+      //DONE: and password is correct
       if (findUser[0].password == userInfo.password) {
         socket.emit('alertUser',"Signing you in...");
         

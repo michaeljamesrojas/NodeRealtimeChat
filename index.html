@@ -64,10 +64,12 @@
 <body>
   <main>
 
-    <!-- <form id="mainForm" action=""> -->
-      <input id="inputName" type="text"/>
-      <input id="inputPass" type="password"/>
-    <!-- </form> -->
+    <!-- <div id="divUserFields"> -->
+    <form id="formUserFields" action="">
+      <input id="inputName" type="text" pattern="[a-z]" />
+      <input id="inputPass" type="password" />
+    </form>
+    <!-- </div> -->
 
     <button id="logIn">Login</button>
     <button id="signUp">SignUp</button>
@@ -81,8 +83,8 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="clientSide.js"> </script>
   <script>
+    //SCOPE: Declarations
     var socket = io();
-
     var messages = document.getElementById('messages');
     var form = document.getElementById('form');
     var input = document.getElementById('input');
@@ -101,13 +103,13 @@
     });
 
     //SCOPE: LOGIN BUTTON FUNCTIONALITY
-    buttLogIn.addEventListener("click", (e) =>{
-      socket.emit('logIn', {name: inputName.value, password: inputPass.value});
+    buttLogIn.addEventListener("click", (e) => {
+      socket.emit('logIn', { name: inputName.value, password: inputPass.value });
     });
 
     //SCOPE: SIGNUP BUTTON FUNCTIONALITY
-    buttonSignUp.addEventListener("click", (e) =>{
-      socket.emit('signUp', {name: inputName.value, password: inputPass.value});
+    buttonSignUp.addEventListener("click", (e) => {
+      socket.emit('signUp', { name: inputName.value, password: inputPass.value });
     });
 
     //SCOPE: alert client functionality
