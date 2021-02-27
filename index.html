@@ -65,6 +65,7 @@
   <main>
 
     <!-- <div id="divUserFields"> -->
+      <!-- TODO: Make input verification using form submission -->
     <form id="formUserFields" action="">
       <input id="inputName" type="text" pattern="[a-z]" />
       <input id="inputPass" type="password" />
@@ -83,6 +84,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="clientSide.js"> </script>
   <script>
+    //TODO: MAKE SCRIPT EXTERNAL
     //SCOPE: Declarations
     var socket = io();
     var messages = document.getElementById('messages');
@@ -116,6 +118,13 @@
     socket.on('alertUser', function (alertMessage) {
       alert(alertMessage);
     });
+
+    //SCOPE: Redirect MAIN PAGE functionality
+    socket.on('redirectMainPage', function (chatUser) {
+      //FOCUS1
+      window.location="./user.html";
+    });
+
 
     //SCOPE: DEFAULT FUNCTIONALITY AS BASIS
     socket.on('chat message', function (msg) {

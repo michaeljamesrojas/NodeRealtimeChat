@@ -20,18 +20,28 @@ io.on('connection', (socket) => {
   
   socket.on('signUp', (userInfo) => {
     //DONE: or SignUP user to list of all users if not already exist 
-    //UNFIN: with correct constraints (i.e. correct username and password input)
-    if(allChatUsers.filter(e => e.name == userInfo.name).length > 0){
+
+    //DONE: Search for the incoming user in the list of all user
+    var findUser = allChatUsers.filter(e => e.name == userInfo.name);
+    
+    //DONE: If username found on list
+    if(findUser.length > 0){
       socket.emit('alertUser',"Username: '" + userInfo.name + "' already taken.");
     }
     else{
-      //
-      var newUser = new chatUser(Math.random(),userInfo.name, userInfo.password,[]);
+      //Create new user object
+      var newUser = new chatUser(userInfo.name, userInfo.password,[]);
       allChatUsers.push(newUser);
       
-      //TEST: 
       socket.emit('alertUser',"You have succesfully signed up");
-      console.log("ALL USERS" + allChatUsers);
+      
+      //DONE: EMIT WITH THE USER DETAILS
+      var userIndexFromAllList = allChatUsers.indexOf(userInfo);
+      socket.emit('redirectMainPage', {currentUser: newUser, allUser: allChatUsers});
+
+      //TEST:
+      console.log({currentUser: newUser, allUser: allChatUsers});
+      // console.log(allChatUsers);
     }
   });
   
@@ -47,9 +57,17 @@ io.on('connection', (socket) => {
       //DONE: and password is correct
       if (findUser[0].password == userInfo.password) {
         socket.emit('alertUser',"Signing you in...");
-        
+
+        //DONE: EMIT WITH THE USER DETAILS
+      var userIndexFromAllList = allChatUsers.indexOf(userInfo);
+      socket.emit('redirectMainPage', {currentUser: findUser[0], allUser: allChatUsers});;
+
+        //TEST:
+
+      console.log({currentUser: findUser[0], allUser: allChatUsers});
+      // console.log(allChatUsers);
       } else {
-        socket.emit('alertUser',"Incorrect password for user "+userInfo.name);
+        socket.emit('alertUser',"Incorrect password for user " + userInfo.name);
       }
     }
     else{
