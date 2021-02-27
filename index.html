@@ -64,11 +64,11 @@
 <body>
   <main>
 
-    <form id="mainForm" action="">
-      <input id="inputName" autocomplete="off" /><button>Send</button>
-    </form>
+    <!-- <form id="mainForm" action=""> -->
+      <input id="inputName" type="text"/>
+    <!-- </form> -->
 
-    <button>Login/SignUp</button>
+    <button id="logInSignUp">Login/SignUp</button>
   </main>
 
   <ul id="messages"></ul>
@@ -84,6 +84,8 @@
     var messages = document.getElementById('messages');
     var form = document.getElementById('form');
     var input = document.getElementById('input');
+    var logInSignUp = document.getElementById('logInSignUp');
+    var inputName = document.getElementById('inputName');
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -91,6 +93,10 @@
         socket.emit('chat message', input.value);
         input.value = '';
       }
+    });
+
+    logInSignUp.addEventListener("click", (e) =>{
+      socket.emit('signLogIn', inputName.innerText);
     });
 
     socket.on('chat message', function (msg) {

@@ -1,4 +1,4 @@
-const { user } = require('./chatUser');
+// const { user } = require('./chatUser');
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
@@ -11,10 +11,14 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
   // console.log('a user connected (Files:)' + files);
-  new user().sayHi();
+  // new user().sayHi();
 
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
+  });
+  
+  socket.on('signLogIn', (name) => {
+    console.log('names');
   });
 
 });
