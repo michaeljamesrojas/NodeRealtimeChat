@@ -1,6 +1,8 @@
-class user {
+class chatUser {
     id;
     username;
+    password;
+    
 
 
     test(){
