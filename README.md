@@ -3,5 +3,6 @@ A simple Node JS Realtime time chat webapp.
 
 
 TODO:
-Log in by Google.
-Actual database implementation.
+1. Log in by Google.
+2. Actual database implementation.
+3. 
