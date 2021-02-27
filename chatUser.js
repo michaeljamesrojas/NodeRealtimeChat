@@ -3,8 +3,8 @@ class user {
     username;
 
 
-    sayHi(){
-        console.log("Hi");    
+    test(){
+        console.log("Hi");
     }
 }
 
