@@ -7,4 +7,4 @@ class chatUser {
     }
 }
 
-module.exports.user = chatUser;
+module.exports = chatUser;

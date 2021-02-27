@@ -1,7 +1,7 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const { chatUser } = require('./chatUser');
+const chatUser = require('./chatUser');
 
 //Array of all users
 var allChatUsers = [];
@@ -23,11 +23,21 @@ io.on('connection', (socket) => {
     // console.log(userInfo);
     // socket.emit('alertUser', "Your info reached the server");
 
-    //UNFIN: add user to list of all users if not already exist
-    if(allChatUsers.filter(e => e.name === userInfo.name)){
+    //DONE: login the user if already exist 
+    //UNFIN: with correct credentials.
+    if(allChatUsers.filter(e => e.name == userInfo.name).length > 0){
       socket.emit('alertUser',"Welcome back " + userInfo.name);
     }
-    //TODO: or simply login the user if already exist with correct credentials.
+    else{
+      //DONE: or SignUP user to list of all users if not already exist 
+      //UNFIN: and correct constraints (i.e. correct username and password)
+      var newUser = new chatUser(Math.random(),userInfo.name, userInfo.pass);
+      allChatUsers.push(newUser);
+      
+      //TEST: 
+      socket.emit('alertUser',"You have succesfully signed up");
+      console.log("ALL USERS" + allChatUsers);
+    }
 
   });
 
