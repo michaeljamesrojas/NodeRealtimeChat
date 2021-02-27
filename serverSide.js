@@ -25,6 +25,7 @@ io.on('connection', (socket) => {
       socket.emit('alertUser',"Username: '" + userInfo.name + "' already taken.");
     }
     else{
+      //
       var newUser = new chatUser(Math.random(),userInfo.name, userInfo.pass);
       allChatUsers.push(newUser);
       
@@ -40,8 +41,9 @@ io.on('connection', (socket) => {
 
     var findUser = allChatUsers.filter(e => e.name == userInfo.name);
     if(findUser.length > 0){
-      if (findUser[0].pass === userInfo.pass) {
+      if (findUser[0].password === userInfo.password) {
         socket.emit('alertUser',"Signing you in...");
+        socket
       } else {
         
       }
