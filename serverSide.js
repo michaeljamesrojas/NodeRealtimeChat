@@ -21,9 +21,10 @@ io.on('connection', (socket) => {
   socket.on('signLogIn', (userInfo) => {
     //TEST:
     // console.log(userInfo);
+    socket.emit('alertUser', "Your infi reached the server");
 
-    //TODO:
-    //
+    //TODO: add user to list of all users if not already exist
+    //or simply login the user if already exist with correct credentials. 
   });
 
 });

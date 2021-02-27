@@ -101,6 +101,10 @@
       socket.emit('signLogIn', {name: inputName.value, pass: inputPass.value});
     });
 
+    socket.on('alertUser', function (alertMessage) {
+      alert(alertMessage);
+    });
+
     socket.on('chat message', function (msg) {
       var item = document.createElement('li');
       item.textContent = msg;
