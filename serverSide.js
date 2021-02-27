@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
     }
     else{
       //
-      var newUser = new chatUser(Math.random(),userInfo.name, userInfo.pass);
+      var newUser = new chatUser(Math.random(),userInfo.name, userInfo.password,[]);
       allChatUsers.push(newUser);
       
       //TEST: 
@@ -39,13 +39,17 @@ io.on('connection', (socket) => {
     //DONE: login the user if already exist 
     //UNFIN: with correct credentials (name and pass).
 
+    //DONE: Search for the incoming user in the list of all user
     var findUser = allChatUsers.filter(e => e.name == userInfo.name);
+
+    //If username found on list
     if(findUser.length > 0){
-      if (findUser[0].password === userInfo.password) {
+      //and password is correct
+      if (findUser[0].password == userInfo.password) {
         socket.emit('alertUser',"Signing you in...");
-        socket
-      } else {
         
+      } else {
+        socket.emit('alertUser',"Incorrect password for user "+userInfo.name);
       }
     }
     else{
