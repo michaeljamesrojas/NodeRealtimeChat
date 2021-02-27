@@ -17,34 +17,38 @@ io.on('connection', (socket) => {
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
   });
-  
+
   socket.on('signUp', (userInfo) => {
     //DONE: or SignUP user to list of all users if not already exist 
 
     //DONE: Search for the incoming user in the list of all user
     var findUser = allChatUsers.filter(e => e.name == userInfo.name);
-    
-    //DONE: If username found on list
-    if(findUser.length > 0){
-      socket.emit('alertUser',"Username: '" + userInfo.name + "' already taken.");
-    }
-    else{
-      //Create new user object
-      var newUser = new chatUser(userInfo.name, userInfo.password,[]);
-      allChatUsers.push(newUser);
-      
-      socket.emit('alertUser',"You have succesfully signed up");
-      
-      //DONE: EMIT WITH THE USER DETAILS
-      var userIndexFromAllList = allChatUsers.indexOf(userInfo);
-      socket.emit('redirectMainPage', {currentUser: newUser, allUser: allChatUsers});
 
+    //DONE: If username found on list
+    if (findUser.length > 0) {
+      socket.emit('alertUser', "Username: '" + userInfo.name + "' already taken.");
+    }
+    else {
+      //Create new user object
+      var newUser = new chatUser(userInfo.name, userInfo.password, []);
+      allChatUsers.push(newUser);
+
+      socket.emit('alertUser', "You have succesfully signed up");
+
+      //DONE: EMIT WITH THE USER DETAILS
+      // var userIndexFromAllList = allChatUsers.indexOf(userInfo);
+      socket.emit('redirectMainPage', { currentUser: newUser, allUser: allChatUsers });
+
+      //FOCUS
+      app.response.sendFile('user.html');
+      app.request.next = "asd";
+      
       //TEST:
-      console.log({currentUser: newUser, allUser: allChatUsers});
+      console.log({ currentUser: newUser, allUser: allChatUsers });
       // console.log(allChatUsers);
     }
   });
-  
+
   socket.on('logIn', (userInfo) => {
     //DONE: login the user if already exist 
     //DONE: if with correct credentials (name and pass).
@@ -53,25 +57,25 @@ io.on('connection', (socket) => {
     var findUser = allChatUsers.filter(e => e.name == userInfo.name);
 
     //DONE: If username found on list
-    if(findUser.length > 0){
+    if (findUser.length > 0) {
       //DONE: and password is correct
       if (findUser[0].password == userInfo.password) {
-        socket.emit('alertUser',"Signing you in...");
+        socket.emit('alertUser', "Signing you in...");
 
         //DONE: EMIT WITH THE USER DETAILS
-      var userIndexFromAllList = allChatUsers.indexOf(userInfo);
-      socket.emit('redirectMainPage', {currentUser: findUser[0], allUser: allChatUsers});;
+        var userIndexFromAllList = allChatUsers.indexOf(userInfo);
+        //socket.emit('redirectMainPage', {currentUser: findUser[0], allUser: allChatUsers});;
 
         //TEST:
 
-      console.log({currentUser: findUser[0], allUser: allChatUsers});
-      // console.log(allChatUsers);
+        console.log({ currentUser: findUser[0], allUser: allChatUsers });
+        // console.log(allChatUsers);
       } else {
-        socket.emit('alertUser',"Incorrect password for user " + userInfo.name);
+        socket.emit('alertUser', "Incorrect password for user " + userInfo.name);
       }
     }
-    else{
-      socket.emit('alertUser',"No such username found");
+    else {
+      socket.emit('alertUser', "No such username found");
     }
   });
 
