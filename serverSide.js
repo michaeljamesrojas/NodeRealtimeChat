@@ -18,19 +18,13 @@ io.on('connection', (socket) => {
     io.emit('chat message', msg);
   });
   
-  socket.on('signLogIn', (userInfo) => {
-    //TEST:
-    // console.log(userInfo);
-    // socket.emit('alertUser', "Your info reached the server");
-
-    //DONE: login the user if already exist 
-    //UNFIN: with correct credentials.
+  socket.on('signUp', (userInfo) => {
+    //DONE: or SignUP user to list of all users if not already exist 
+    //UNFIN: with correct constraints (i.e. correct username and password input)
     if(allChatUsers.filter(e => e.name == userInfo.name).length > 0){
-      socket.emit('alertUser',"Welcome back " + userInfo.name);
+      socket.emit('alertUser',"Username: '" + userInfo.name + "' already taken.");
     }
     else{
-      //DONE: or SignUP user to list of all users if not already exist 
-      //UNFIN: and correct constraints (i.e. correct username and password)
       var newUser = new chatUser(Math.random(),userInfo.name, userInfo.pass);
       allChatUsers.push(newUser);
       
@@ -38,7 +32,23 @@ io.on('connection', (socket) => {
       socket.emit('alertUser',"You have succesfully signed up");
       console.log("ALL USERS" + allChatUsers);
     }
+  });
+  
+  socket.on('logIn', (userInfo) => {
+    //DONE: login the user if already exist 
+    //UNFIN: with correct credentials (name and pass).
 
+    var findUser = allChatUsers.filter(e => e.name == userInfo.name);
+    if(findUser.length > 0){
+      if (findUser[0].pass === userInfo.pass) {
+        socket.emit('alertUser',"Signing you in...");
+      } else {
+        
+      }
+    }
+    else{
+      socket.emit('alertUser',"No such username found");
+    }
   });
 
 });

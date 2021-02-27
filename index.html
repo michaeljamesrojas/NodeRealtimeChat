@@ -69,7 +69,8 @@
       <input id="inputPass" type="password"/>
     <!-- </form> -->
 
-    <button id="logInSignUp">Login/SignUp</button>
+    <button id="logIn">Login</button>
+    <button id="signUp">SignUp</button>
   </main>
 
   <ul id="messages"></ul>
@@ -85,10 +86,12 @@
     var messages = document.getElementById('messages');
     var form = document.getElementById('form');
     var input = document.getElementById('input');
-    var logInSignUp = document.getElementById('logInSignUp');
+    var buttLogIn = document.getElementById('logIn');
+    var buttonSignUp = document.getElementById('signUp');
     var inputName = document.getElementById('inputName');
     var inputPass = document.getElementById('inputPass');
 
+    //SCOPE: DEFAULT FUNCTIONALITY FORM SUBMIT
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (input.value) {
@@ -97,14 +100,22 @@
       }
     });
 
-    logInSignUp.addEventListener("click", (e) =>{
-      socket.emit('signLogIn', {name: inputName.value, pass: inputPass.value});
+    //SCOPE: LOGIN BUTTON FUNCTIONALITY
+    buttLogIn.addEventListener("click", (e) =>{
+      socket.emit('logIn', {name: inputName.value, pass: inputPass.value});
     });
 
+    //SCOPE: SIGNUP BUTTON FUNCTIONALITY
+    buttonSignUp.addEventListener("click", (e) =>{
+      socket.emit('signUp', {name: inputName.value, pass: inputPass.value});
+    });
+
+    //SCOPE: alert client functionality
     socket.on('alertUser', function (alertMessage) {
       alert(alertMessage);
     });
 
+    //SCOPE: DEFAULT FUNCTIONALITY AS BASIS
     socket.on('chat message', function (msg) {
       var item = document.createElement('li');
       item.textContent = msg;
