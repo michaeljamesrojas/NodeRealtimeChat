@@ -101,6 +101,7 @@
 
     <main>
       <div id="contacts">
+        <h3>Contacts</h3>
         <ul>
           <li>asdafafasfas</li>
           <li>asdafafasfas</li>
@@ -111,14 +112,10 @@
         </ul>
       </div>
       <div id="globalOnline">
-        <H3>Global online</H3>
+        <H3>Find Contacts Global</H3>
         <ul>
-          <li>asdafafasfas</li>
-          <li>asdafafasfas</li>
-          <li>asdafafasfas</li>
-          <li>asdafafasfas</li>
-          <li>asdafafasfas</li>
-          <li>asdafafasfas</li>
+
+        </ul>
         
       </div>
       <div id=""></div>
@@ -143,6 +140,7 @@
     var inputName = document.getElementById('inputName');
     var inputPass = document.getElementById('inputPass');
     var divAuthenticationBG = document.getElementById('divAuthenticationBG');
+    var user;
 
     //SCOPE: DEFAULT FUNCTIONALITY FORM SUBMIT
     form.addEventListener('submit', function (e) {
@@ -155,17 +153,49 @@
 
     //SCOPE: LOGIN BUTTON FUNCTIONALITY
     buttLogIn.addEventListener("click", (e) => {
-      socket.emit('logIn', { name: inputName.value, password: inputPass.value });
+      user = { name: inputName.value, password: inputPass.value };
+      socket.emit('logIn', user);
     });
-
+    
     //SCOPE: SIGNUP BUTTON FUNCTIONALITY
     buttonSignUp.addEventListener("click", (e) => {
-      socket.emit('signUp', { name: inputName.value, password: inputPass.value });
+      user = { name: inputName.value, password: inputPass.value };
+      socket.emit('signUp', user);
     });
+    
 
     //SCOPE: alert client functionality
     socket.on('alertUser', function (alertMessage) {
       alert(alertMessage);
+    });
+    
+    //SCOPE: client disconnect functionality
+    socket.on('disconnect', (param) => {//FOCUS6
+      socket.emit('clientMessage',"I will disconnect");
+    });
+    
+    //SCOPE: update global list
+    socket.on('updateGlobal', function (allUser) {
+      var ulGlobalOnline = document.querySelector('#globalOnline > ul');
+      //DONE: clearListFirst
+      while (ulGlobalOnline.hasChildNodes()) {
+        ulGlobalOnline.removeChild(ulGlobalOnline.firstChild);
+      }
+
+      //DONE: Add each names in list
+      allUser.forEach(eachUser => {
+        var newLi = document.createElement('li');
+        //TODO: Better Online indicator
+        //FOCUS 5
+        //If onlineStatus Array is not empty then online
+        newLi.textContent = ((eachUser.onlineStatus.length > 0)?'ONLINE: ':'OFFLINE: ' ) + eachUser.name;
+        
+        //DONE: excluding self
+        if(eachUser.name != user.name){
+          ulGlobalOnline.appendChild(newLi);
+
+        }
+      });
     });
     
     //SCOPE: make login request functionality

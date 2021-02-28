@@ -5,6 +5,7 @@ class chatUser {
         this.name = name;
         this.password = password;
         this.contacts = contacts;
+        this.onlineStatus = new Array();
     }
 }
 
