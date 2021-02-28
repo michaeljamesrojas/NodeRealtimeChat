@@ -96,7 +96,7 @@
 
   <div id="divMain">
     <header>
-      <h3></h3>
+      <p></p>
     </header>
 
     <main>
@@ -111,6 +111,7 @@
         </ul>
       </div>
       <div id="globalOnline">
+        <H3>Global online</H3>
         <ul>
           <li>asdafafasfas</li>
           <li>asdafafasfas</li>
@@ -123,7 +124,7 @@
       <div id=""></div>
     </main>
 
-    <footer>Developed by: MichaelJamesRojas SDasdasdasdsfsdfsdfsdfsdfsdfdsfsdf</footer>
+    <footer>Developed by: MichaelJamesRojas</footer>
   </div>
 
 
@@ -132,6 +133,7 @@
   <script>
     //TODO: MAKE SCRIPT EXTERNAL
     //SCOPE: Declarations
+    
     var socket = io();
     var messages = document.getElementById('messages');
     var form = document.getElementById('form');
@@ -165,12 +167,20 @@
     socket.on('alertUser', function (alertMessage) {
       alert(alertMessage);
     });
+    
+    //SCOPE: make login request functionality
+    socket.on('makeLogInRequest', function () {
+      socket.emit('logIn', { name: inputName.value, password: inputPass.value });
+    });
 
     //SCOPE: Redirect MAIN PAGE functionality
-    socket.on('redirectMainPage', function (chatUser) {
-      //FOCUS2
-     divAuthenticationBG.style.visibility = "hidden";
-     
+    socket.on('redirectMainPage', function () {
+      divAuthenticationBG.style.visibility = "hidden";
+    });
+    
+    //SCOPE: Update user header functionality
+    socket.on('updateUserHeader', function (name) {
+      document.querySelector("header > p").innerText = name;
     });
 
 
@@ -181,6 +191,8 @@
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
     });
+
+    //SCOPE: functions
   </script>
 </body>
 

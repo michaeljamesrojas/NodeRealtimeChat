@@ -1,9 +1,11 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const { Socket } = require('dgram');
 const { response } = require('express');
 const { request } = require('http');
 const chatUser = require('./chatUser');
+var findUser = null;
 
 //Array of all users
 var allChatUsers = [];
@@ -16,44 +18,64 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   console.log('a user connected');
 
+  //SCOPE: Update client contacts list
+  function updateClientContacts(){
+    //UNFIN
+  }
+
+  function updateGlobalUsers(){
+    
+  }
+
+  //SCOPE: All in one client update
+  function updateUserPage(){//FOCUS4
+    socket.emit('updateUserHeader', findUser[0].name);
+    updateClientContacts();
+    updateGlobalUsers();
+  }
+
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
   });
-
+  
+  //SCOPE: SIGNUP
   socket.on('signUp', (userInfo) => {
-    //DONE: or SignUP user to list of all users if not already exist 
+    //DONE: or SignUP user to list of all users
 
-    //DONE: Search for the incoming user in the list of all user
-    var findUser = allChatUsers.filter(e => e.name == userInfo.name);
+    //NOTE: todelete
+    // //DONE: Search for the incoming user in the list of all user
+    // findUser = allChatUsers.filter(e => e.name == userInfo.name);
 
-    //DONE: If username found on list
-    if (findUser.length > 0) {
-      socket.emit('alertUser', "Username: '" + userInfo.name + "' already taken.");
-    }
-    else {
-      //Create new user object
-      var newUser = new chatUser(userInfo.name, userInfo.password, []);
-      allChatUsers.push(newUser);
+    // //DONE: If username found on list
+    // if (findUser.length > 0) {
+    //   socket.emit('alertUser', "Username: '" + userInfo.name + "' already taken.");
+    // }
+    // else {
 
-      socket.emit('alertUser', "You have succesfully signed up");
 
-      //DONE: EMIT WITH THE USER DETAILS
-      // var userIndexFromAllList = allChatUsers.indexOf(userInfo);
-      socket.emit('redirectMainPage', { currentUser: newUser, allUser: allChatUsers });
+    //Create new user object
+    var newUser = new chatUser(userInfo.name, userInfo.password, []);
+    allChatUsers.push(newUser);
+    socket.emit('alertUser', "You have succesfully signed up");
 
-        
-      //TEST:
-      console.log({ currentUser: newUser, allUser: allChatUsers });
-      // console.log(allChatUsers);
-    }
+    //SCOPE: SIGN THE USER IN
+    socket.emit("makeLogInRequest");  
+
+    //TEST:
+    console.log({ currentUser: newUser, allUser: allChatUsers });
+    // console.log(allChatUsers);
+
+      // NOTE: Todelete
+      //}
   });
 
+  //SCOPE: Login
   socket.on('logIn', (userInfo) => {
     //DONE: login the user if already exist 
     //DONE: if with correct credentials (name and pass).
 
     //DONE: Search for the incoming user in the list of all user
-    var findUser = allChatUsers.filter(e => e.name == userInfo.name);
+    findUser = allChatUsers.filter(e => e.name == userInfo.name);
 
     //DONE: If username found on list
     if (findUser.length > 0) {
@@ -63,10 +85,10 @@ io.on('connection', (socket) => {
 
         //DONE: EMIT WITH THE USER DETAILS
         // var userIndexFromAllList = allChatUsers.indexOf(userInfo);
-        socket.emit('redirectMainPage', {currentUser: findUser[0], allUser: allChatUsers});;
+        socket.emit('redirectMainPage');
+        updateUserPage();//FOCUS 3
 
         //TEST:
-
         console.log({ currentUser: findUser[0], allUser: allChatUsers });
         // console.log(allChatUsers);
       } else {
