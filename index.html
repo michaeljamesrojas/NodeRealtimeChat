@@ -188,7 +188,7 @@
         //TODO: Better Online indicator
         //FOCUS 5
         //If onlineStatus Array is not empty then online
-        newLi.textContent = ((eachUser.onlineStatus.length > 0)?'ONLINE: ':'OFFLINE: ' ) + eachUser.name;
+        newLi.textContent = ((eachUser.isOnline)?'ONLINE: ':'OFFLINE: ' ) + eachUser.name;
         
         //DONE: excluding self
         if(eachUser.name != user.name){

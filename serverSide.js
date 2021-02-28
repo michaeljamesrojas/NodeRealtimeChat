@@ -5,6 +5,7 @@ const { Socket } = require('dgram');
 const { response } = require('express');
 const { request } = require('http');
 const chatUser = require('./chatUser');
+const onlineStatus = require('./onlineStatus');
 // var findUser = null;
 
 //Array of all users
@@ -28,23 +29,19 @@ io.on('connection', (socket) => {
 
   function updateGlobalUsers() {
     io.emit('updateGlobal', allChatUsers.map(a =>  { 
-      return {name: a.name, isOnline: a.isOnline};//Send only name and online status
+      return {name: a.name, isOnline: a.onlineStatus.isOnline};//Send only name and online status
     }));
 
     // TEST:
     // console.log(allChatUsers.map(a => a.name));
   }
 
-  function removeSocketIDFromUsersStatus(socketID) {//FOCUS8
-    //TODO:
-    
-  }
 
   //SCOPE: SOCKETS
   //SCOPE: DISCONNECTED
   socket.on('disconnect', (param) => {//FOCUS7
-    //TODO: update online status via socket id
-    removeSocketIDFromUsersStatus(socket.id);
+    //DONE: update online status via socket id
+    //FOCUS10
 
     updateGlobalUsers();
     
@@ -113,8 +110,9 @@ io.on('connection', (socket) => {
       if (findUser[0].password == userInfo.password) {
         socket.emit('alertUser', "Signing you in...");
 
-        //DONE: EMIT WITH THE USER DETAILS
-        // var userIndexFromAllList = allChatUsers.indexOf(userInfo);
+        //Update current users online status object
+        findUser[0].onlineStatus.addSocketID(socket.id);//FOCUS9
+
         socket.emit('redirectMainPage');
         updateUserPage();//FOCUS 3
 

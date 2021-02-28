@@ -1,3 +1,5 @@
+onlineStatus = require('./onlineStatus');
+
 class chatUser {
     constructor(name, password, contacts) {
         //NOTE: TEMPORARY ID GENERATOR
@@ -5,7 +7,7 @@ class chatUser {
         this.name = name;
         this.password = password;
         this.contacts = contacts;
-        this.onlineStatus = new Array();
+        this.onlineStatus = new onlineStatus();
     }
 }
 
