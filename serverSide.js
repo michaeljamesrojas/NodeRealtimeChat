@@ -1,6 +1,8 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const { response } = require('express');
+const { request } = require('http');
 const chatUser = require('./chatUser');
 
 //Array of all users
@@ -39,10 +41,7 @@ io.on('connection', (socket) => {
       // var userIndexFromAllList = allChatUsers.indexOf(userInfo);
       socket.emit('redirectMainPage', { currentUser: newUser, allUser: allChatUsers });
 
-      //FOCUS
-      app.response.sendFile('user.html');
-      app.request.next = "asd";
-      
+        
       //TEST:
       console.log({ currentUser: newUser, allUser: allChatUsers });
       // console.log(allChatUsers);
@@ -63,8 +62,8 @@ io.on('connection', (socket) => {
         socket.emit('alertUser', "Signing you in...");
 
         //DONE: EMIT WITH THE USER DETAILS
-        var userIndexFromAllList = allChatUsers.indexOf(userInfo);
-        //socket.emit('redirectMainPage', {currentUser: findUser[0], allUser: allChatUsers});;
+        // var userIndexFromAllList = allChatUsers.indexOf(userInfo);
+        socket.emit('redirectMainPage', {currentUser: findUser[0], allUser: allChatUsers});;
 
         //TEST:
 
