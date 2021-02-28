@@ -10,7 +10,7 @@ const onlineStatus = require('./onlineStatus');
 
 //Array of all users
 var allChatUsers = [];
-
+var socketIDAndUserName = new Object();
 
 
 app.get('/', (req, res) => {
@@ -25,28 +25,62 @@ io.on('connection', (socket) => {
   //SCOPE: Update client contacts list
   function updateClientContacts() {
     
+
   }
 
   function updateGlobalUsers() {
     io.emit('updateGlobal', allChatUsers.map(a =>  { 
-      return {name: a.name, isOnline: a.onlineStatus.isOnline};//Send only name and online status
+      return {name: a.name, isOnline: a.isOnline};//Send only name and online status
     }));
 
     // TEST:
     // console.log(allChatUsers.map(a => a.name));
   }
 
+  function deleteSocketIDForOnlineStatus(socketID){
+
+    // get username of disconnecting socket
+    var name = socketIDAndUserName[socketID.toString()];
+    
+    //Remove socketID in list wether exist or not
+    delete socketIDAndUserName[socketID.toString()];
+    
+    //DONE: if a username is paired with the socket
+    if(name != undefined){
+      updateUsersOnlineStatus(name);
+    }//else then socket connection is not signed in
+    
+  }
+  
+  function addSocketIDandUserNameForOnlineStatus(socketIDToAdd, name){
+    socketIDAndUserName[socketIDToAdd.toString()] = name;
+
+    updateUsersOnlineStatus(name);
+  }
+
+  function updateUsersOnlineStatus(name){
+    var findUser = allChatUsers.filter(e => e.name == name);
+    
+    //Look if name is found in socketIDAndUserName list, if found
+    if(Object.values(socketIDAndUserName).includes(name)){
+      //then user is online
+      allChatUsers[allChatUsers.indexOf(findUser[0])].isOnline = true;
+    }
+    else{//offline
+      allChatUsers[allChatUsers.indexOf(findUser[0])].isOnline = false;
+    }
+  }
 
   //SCOPE: SOCKETS
   //SCOPE: DISCONNECTED
-  socket.on('disconnect', (param) => {//FOCUS7
+  socket.on('disconnect', (param) => {
     //DONE: update online status via socket id
-    //FOCUS10
-
+    deleteSocketIDForOnlineStatus(socket.id);
+    
     updateGlobalUsers();
     
     //TEST:
-    io.emit('alertUser', "someone disconnected soc ID: " + socket.id );
+    // io.emit('alertUser', "someone disconnected soc ID: " + socket.id );
   });
 
 
@@ -111,7 +145,7 @@ io.on('connection', (socket) => {
         socket.emit('alertUser', "Signing you in...");
 
         //Update current users online status object
-        findUser[0].onlineStatus.addSocketID(socket.id);//FOCUS9
+        addSocketIDandUserNameForOnlineStatus(socket.id, findUser[0].name);
 
         socket.emit('redirectMainPage');
         updateUserPage();//FOCUS 3

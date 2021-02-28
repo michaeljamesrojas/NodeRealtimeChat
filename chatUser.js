@@ -1,4 +1,4 @@
-onlineStatus = require('./onlineStatus');
+// onlineStatus = require('./onlineStatus');
 
 class chatUser {
     constructor(name, password, contacts) {
@@ -7,7 +7,8 @@ class chatUser {
         this.name = name;
         this.password = password;
         this.contacts = contacts;
-        this.onlineStatus = new onlineStatus();
+        this.isOnline = false;
+        // this.onlineStatus = new onlineStatus();
     }
 }
 

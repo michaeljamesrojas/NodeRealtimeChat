@@ -96,7 +96,7 @@
 
   <div id="divMain">
     <header>
-      <p></p>
+      <p>Welcome </p>
     </header>
 
     <main>
@@ -169,10 +169,10 @@
       alert(alertMessage);
     });
     
-    //SCOPE: client disconnect functionality
-    socket.on('disconnect', (param) => {//FOCUS6
-      socket.emit('clientMessage',"I will disconnect");
-    });
+    // //SCOPE: client disconnect functionality
+    // socket.on('disconnect', (param) => {
+    //   socket.emit('clientMessage',"I will disconnect");
+    // });
     
     //SCOPE: update global list
     socket.on('updateGlobal', function (allUser) {
@@ -186,7 +186,6 @@
       allUser.forEach(eachUser => {
         var newLi = document.createElement('li');
         //TODO: Better Online indicator
-        //FOCUS 5
         //If onlineStatus Array is not empty then online
         newLi.textContent = ((eachUser.isOnline)?'ONLINE: ':'OFFLINE: ' ) + eachUser.name;
         
