@@ -4,7 +4,7 @@
 <head>
   <title>Socket.IO chat</title>
   <style>
-    body {
+    /* body {
       margin: 0;
       padding-bottom: 3rem;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -57,7 +57,7 @@
 
     #messages>li:nth-child(odd) {
       background: #efefef;
-    }
+    } */
 
     /*TODO: MAke style external  */
     /* SCOPE: AUTHENTICATION STYLES */
@@ -66,6 +66,41 @@
       position: absolute;
       width: 100%;
       height: 100%;
+    }
+
+    #divMain {
+      background-color: rgba(207, 235, 235, 0.507);
+      min-height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-areas: 
+      'headr headr headr'
+      'contacts mainFunction global'
+      'footr footr footr';
+    }
+
+    header {
+      background-color: rgba(0, 93, 93, 0.363);
+      grid-area: headr;
+    }
+
+    #contacts {
+      background-color: rgba(0, 128, 0, 0.411);
+      grid-area: contacts;
+    }
+
+    footer {
+      grid-area: footr;
+    }
+
+    #globalOnline {
+      background-color: rgba(0, 0, 255, 0.315);
+      grid-area: global;
+    }
+
+    #divMessaging {
+      grid-area: mainFunction;
+      background-color: rgba(255, 223, 223, 0.65);
     }
   </style>
 </head>
@@ -106,6 +141,19 @@
           <li>Sample List</li>
           <li>Sample List</li>
         </ul>
+      </div>
+      <div id="divMessaging">
+        <h2>Conversation</h2>
+        <div id="divConversation">
+          <div class='fromYou'>Hi its me</div>
+          <div class='notFromYou'>Oh you added me</div>
+          <div class='fromYou'>yes haha</div>
+          <div class='notFromYou'>Haha, BTW, how are you?</div>
+        </div>
+        <div id="divMessageComposer">
+          <input id= 'messageToSend' type="text">
+          <button id="send">SEND</button>
+        </div>
       </div>
       <div id="globalOnline">
         <H3>Find Contacts Global</H3>
@@ -164,7 +212,6 @@
       user['password'] = inputPass.value;
       socket.emit('signUp', user);
     });
-
 
 
     //SCOPE: show login functionality

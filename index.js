@@ -187,7 +187,7 @@ io.on('connection', (socket) => {
       //DONE: and password is correct
       if (findUser[0].password == userInfo.password) {
         socket.emit('alertUser', "Signing you in...");
-        socket.emit('redirectMainPage', {name: findUser[0].name, contacts: findUser[0].contacts});//FOCUS give contacts also
+        socket.emit('redirectMainPage', {name: findUser[0].name, contacts: findUser[0].contacts});
 
         //Update current users online status object
         addSocketIDandUserNameForOnlineStatus(socket.id, findUser[0].name);
