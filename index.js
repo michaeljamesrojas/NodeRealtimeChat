@@ -23,6 +23,11 @@ io.on('connection', (socket) => {
 
   socket.emit('showLogIn');
 
+  //NOTE: Is this good to update globaly every timeframe?
+  setInterval(() => {
+    updateGlobalUsers();
+  }, 300);
+
   //SCOPE: FUNCTIONS
   //SCOPE: Update client contacts list
 
@@ -96,7 +101,6 @@ io.on('connection', (socket) => {
 
     //DONE Broadcast users online status and broadcast global changed
     broadcastUserStatusChanged(name);
-    updateGlobalUsers();
   }
 
   function broadcastUserStatusChanged(name){
@@ -183,15 +187,11 @@ io.on('connection', (socket) => {
       //DONE: and password is correct
       if (findUser[0].password == userInfo.password) {
         socket.emit('alertUser', "Signing you in...");
+        socket.emit('redirectMainPage', {name: findUser[0].name, contacts: findUser[0].contacts});//FOCUS give contacts also
 
         //Update current users online status object
         addSocketIDandUserNameForOnlineStatus(socket.id, findUser[0].name);
 
-        socket.emit('redirectMainPage', findUser[0].name);
-
-        //TEST:
-        // console.log({ currentUser: findUser[0], allUser: allChatUsers });
-        // console.log(allChatUsers);
       } else {
         socket.emit('alertUser', "Incorrect password for user " + userInfo.name);
       }

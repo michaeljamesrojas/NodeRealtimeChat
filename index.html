@@ -98,7 +98,7 @@
     <header>
       <p>Welcome </p>
     </header>
-    
+
     <main>
       <div id="contacts">
         <h3>Contacts</h3>
@@ -114,9 +114,9 @@
           <button>+</button>
           <li>Sample List</li>
           <button>+</button>
-          
+
         </ul>
-        
+
       </div>
       <div id=""></div>
     </main>
@@ -130,7 +130,7 @@
   <script>
     //TODO: MAKE SCRIPT EXTERNAL
     //SCOPE: Declarations
-    
+
     var socket = io();
     var messages = document.getElementById('messages');
     var form = document.getElementById('form');
@@ -140,7 +140,7 @@
     var inputName = document.getElementById('inputName');
     var inputPass = document.getElementById('inputPass');
     var divAuthenticationBG = document.getElementById('divAuthenticationBG');
-    var user = {name:'', password:'', contacts:[]};
+    var user = { name: '', password: '', contacts: [] };
 
     //SCOPE: DEFAULT FUNCTIONALITY FORM SUBMIT
     form.addEventListener('submit', function (e) {
@@ -157,18 +157,18 @@
       user['password'] = inputPass.value;
       socket.emit('logIn', user);
     });
-    
+
     //SCOPE: SIGNUP BUTTON FUNCTIONALITY
     buttonSignUp.addEventListener("click", (e) => {
       user['name'] = inputName.value;
       user['password'] = inputPass.value;
       socket.emit('signUp', user);
     });
-    
+
 
 
     //SCOPE: show login functionality
-    socket.on('showLogIn', ()=> {
+    socket.on('showLogIn', () => {
       divAuthenticationBG.style.visibility = "visible";
     });
 
@@ -176,12 +176,12 @@
     socket.on('alertUser', function (alertMessage) {
       alert(alertMessage);
     });
-    
+
     // //SCOPE: client disconnect functionality
     // socket.on('disconnect', (param) => {
     //   socket.emit('clientMessage',"I will disconnect");
     // });
-    
+
     //SCOPE: update global list
     socket.on('updateGlobal', function (allUser) {
       var ulGlobalOnline = document.querySelector('#globalOnline > ul');
@@ -196,42 +196,48 @@
         var newButton = document.createElement('button');
         //TODO: Better Online indicator
         //If online/offline then add indicator
-        newLi.textContent = ((eachUser.isOnline)?'ONLINE: ':'OFFLINE: ' ) + eachUser.name;
+        newLi.textContent = ((eachUser.isOnline) ? 'ONLINE: ' : 'OFFLINE: ') + eachUser.name;
         
-        //Add button to add contact if not in contacts yet
-        newButton.innerText = "+";
-        // newButton.dataset['username'] = eachUser.name;
-        newButton.addEventListener('click', (param)=>{
-          socket.emit("addToContacts", {currentUserName: user.name, addToContact: eachUser.name});
-          
-          //TEST:
-          // socket.emit("clientMessage", "contact request friend");
-        });
-
-        //DONE: excluding self
-        if(eachUser.name != user.name){
+        
+        //DONE: excluding self from displaying on global
+        if (eachUser.name != user.name) {
           ulGlobalOnline.appendChild(newLi);
-          ulGlobalOnline.appendChild(newButton);
+
+          //Add button to add contact if not in contacts yet if of course contacts is not undefined also
+          if (user.contacts != undefined &&  !user.contacts.includes(eachUser.name)) {
+            newButton.innerText = "+";
+            // newButton.dataset['username'] = eachUser.name;
+            newButton.addEventListener('click', (param) => {
+              socket.emit("addToContacts", { currentUserName: user.name, addToContact: eachUser.name });
+              
+              //TEST:
+              // socket.emit("clientMessage", "contact request friend");
+            });
+            ulGlobalOnline.appendChild(newButton);
+          }
         }
       });
     });
-    
+
     //SCOPE: make login request functionality
     socket.on('makeLogInRequest', function () {
       socket.emit('logIn', { name: inputName.value, password: inputPass.value });
     });
 
     //SCOPE: Redirect MAIN PAGE functionality
-    socket.on('redirectMainPage', function (name) {
+    socket.on('redirectMainPage', function (paramUser) {
+      //NOTE: Temporary: empty the password and just hide the login for now instead of redirect
+      user.password = '';
+      user.contacts = paramUser.contacts;
       divAuthenticationBG.style.visibility = "hidden";
-      document.querySelector('header > p').innerText = "Welcome " + name;
+      document.querySelector('header > p').innerText = "Welcome " + paramUser.name;
     });
-    
+
     //SCOPE: Update user header functionality
     socket.on('updateUserHeader', function (name) {
       document.querySelector("header > p").innerText = name;
     });
-    
+
     //SCOPE: request an update if someones status change has impact on current user
     socket.on('someoneChangedStatus', function (name) {
       //If that someone is in my contacts or that's me then update my contacts
@@ -239,7 +245,7 @@
         socket.emit('clientRequestUpdateContact', user.name);
       }
     });
-    
+
     //SCOPE: Update contacts list
     socket.on('updateContactList', function (param) {
       //if this broadcast update is for me
