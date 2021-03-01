@@ -153,7 +153,7 @@ io.on('connection', (socket) => {
 
     //FOCUS every push must update the two talking person
     conversations.push(messageObj);
-    // addToConversations(messageObj);//Make a general function for trigger
+    // addToConversations(messageObj);
 
     //then update the client about all its messages to the person of interest
     socket.emit('updateConversationHistory', returnAllConversationsOfAAndB(param.sender, param.sendTo));
@@ -164,6 +164,16 @@ io.on('connection', (socket) => {
     //Send all the messages
   });
   
+  function addToConversations(messageObj){
+    conversations.push(messageObj);
+    //FOCUS7
+    //Everytime a message is added to conversations
+    //Tell the messageSender and receiver to send a request for an update of their history from the server
+    //do this by broadcasting it with the name attached for them to react accordingly
+    io.emit('makeAConvoRequestIfItsYou', messageObj.sender);
+    io.emit('makeAConvoRequestIfItsYou', messageObj.receiver);
+  }
+
   function returnAllConversationsOfAAndB(a , b){
     //DONE Filter out and only return conversations with a and b
     var toReturn =  conversations.filter((eachMessage) => 

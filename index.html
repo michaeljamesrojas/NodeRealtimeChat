@@ -261,9 +261,10 @@
       divAuthenticationBG.style.visibility = "visible";
     });
     
-    //SCOPE: General socket functionality
-    socket.on('sendThisAsEmitBackToMeMyClient', (param) => {
-      socket.emit(param);
+    
+    //SCOPE: makeAConvoRequestIfItsYou functionality
+    socket.on('makeAConvoRequestIfItsYou', (name) => {
+      socket.emit('sendMeConvoUpdateMyServer');
     });
 
 
@@ -388,7 +389,7 @@
 
     //SCOPE: Update contacts list
     socket.on('updateContactList', function (param) {
-      //TEST:
+      //TEST://FOCUSc bug
       console.log('I should update my Contact list from param:');
       console.log(param);
 
