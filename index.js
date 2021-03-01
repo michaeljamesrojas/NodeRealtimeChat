@@ -6,6 +6,7 @@ const { response } = require('express');
 const { request } = require('http');
 const chatUser = require('./chatUser');
 const onlineStatus = require('./onlineStatus');
+const Message = require('./message');
 // var findUser = null;
 
 //Array of all users
@@ -24,9 +25,9 @@ io.on('connection', (socket) => {
   socket.emit('showLogIn');
 
   //NOTE: Is this good to update globaly every timeframe?
-  setInterval(() => {
-    updateGlobalUsers();
-  }, 300);
+  // setInterval(() => {
+  //   updateGlobalUsers();
+  // }, 300);
 
   //SCOPE: FUNCTIONS
   //SCOPE: Update client contacts list
@@ -43,7 +44,12 @@ io.on('connection', (socket) => {
 
   //SCOPE: Update contact list of user
   function updateContactList(username){
+    
     var findUser = allChatUsers.filter(chatUser => chatUser.name == username);
+    
+    //TEST
+    console.log('finduser result for request of client: ' + username);
+    console.log(findUser);
 
     var contacts = findUser[0].contacts;
     //DONE: get the contact names of this username and their corresponding online statuses
@@ -59,6 +65,16 @@ io.on('connection', (socket) => {
     };
     //Send only the list of contacts and their status
     io.emit('updateContactList', param);
+
+    //Whenever someone update contacts then update global also
+    updateGlobalUsers();
+
+    //TEST:
+    console.log('This is in the server');
+    console.log(allChatUsers);
+    console.log('and this is to send');
+    console.log(param);
+
   }
 
   //SCOPE: socket deleter from list
@@ -101,6 +117,8 @@ io.on('connection', (socket) => {
 
     //DONE Broadcast users online status and broadcast global changed
     broadcastUserStatusChanged(name);
+
+    updateGlobalUsers();//UNFIN?
   }
 
   function broadcastUserStatusChanged(name){
@@ -121,6 +139,28 @@ io.on('connection', (socket) => {
   //SCOPE: clientRequestUpdateContact
   socket.on('clientRequestUpdateContact', (name)=>{
     updateContactList(name);
+  });
+  
+  //SCOPE: clientSendMessageTo
+  socket.on('clientSendMessageTo', (param)=>{
+    //FOCUS3
+    //Accept the client message request by
+    //finding the client from all the user via socketID?
+    //then //TRY SUBMIT BUTT FIRST
+  });
+  
+  //SCOPE: clientAskForConversationHistory 
+  socket.on('clientAskForConversationHistory', (param)=>{
+    //FOCUS2
+    //Send back the data by
+    //knowing first the client and the personToTalkTo
+    //then find the client if exist in all Users list
+    //then getting the conversation data with personToTalkTo
+    //then send it back 
+
+    //TEST: 
+    //Try sending a fake data
+
   });
 
   //SCOPE: add to contact of current user
@@ -191,7 +231,6 @@ io.on('connection', (socket) => {
 
         //Update current users online status object
         addSocketIDandUserNameForOnlineStatus(socket.id, findUser[0].name);
-
       } else {
         socket.emit('alertUser', "Incorrect password for user " + userInfo.name);
       }

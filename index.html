@@ -72,7 +72,7 @@
       background-color: rgba(207, 235, 235, 0.507);
       min-height: 100%;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 2fr 1fr;
       grid-template-areas: 
       'headr headr headr'
       'contacts mainFunction global'
@@ -101,6 +101,10 @@
     #divMessaging {
       grid-area: mainFunction;
       background-color: rgba(255, 223, 223, 0.65);
+    }
+
+    .clickContact:hover {
+      background-color: rgba(255, 0, 0, 0.363);
     }
   </style>
 </head>
@@ -138,12 +142,13 @@
       <div id="contacts">
         <h3>Contacts</h3>
         <ul>
-          <li>Sample List</li>
-          <li>Sample List</li>
+          <li class="clickContact">Sample List</li>
+          <li class="clickContact">Sample List</li>
+          <li class="clickContact">Sample List</li>
         </ul>
       </div>
       <div id="divMessaging">
-        <h2>Conversation</h2>
+        <h2 id="personToTalkTo">Conversation with</h2>
         <div id="divConversation">
           <div class='fromYou'>Hi its me</div>
           <div class='notFromYou'>Oh you added me</div>
@@ -189,6 +194,10 @@
     var inputPass = document.getElementById('inputPass');
     var divAuthenticationBG = document.getElementById('divAuthenticationBG');
     var user = { name: '', password: '', contacts: [] };
+    var inputMessageToSend = document.getElementById('messageToSend');
+    var buttSend = document.getElementById('send');
+
+    
 
     //SCOPE: DEFAULT FUNCTIONALITY FORM SUBMIT
     form.addEventListener('submit', function (e) {
@@ -218,6 +227,8 @@
     socket.on('showLogIn', () => {
       divAuthenticationBG.style.visibility = "visible";
     });
+    
+    
 
     //SCOPE: alert client functionality
     socket.on('alertUser', function (alertMessage) {
@@ -273,10 +284,12 @@
 
     //SCOPE: Redirect MAIN PAGE functionality
     socket.on('redirectMainPage', function (paramUser) {
-      //NOTE: Temporary: empty the password and just hide the login for now instead of redirect
-      user.password = '';
+      //NOTE: Temporary: just hide the login for now instead of redirect
+      // user.password = '';
+      user.name = paramUser.name;
       user.contacts = paramUser.contacts;
       divAuthenticationBG.style.visibility = "hidden";
+      document.querySelector('#divMessaging').style.visibility = 'hidden';
       document.querySelector('header > p').innerText = "Welcome " + paramUser.name;
     });
 
@@ -295,9 +308,13 @@
 
     //SCOPE: Update contacts list
     socket.on('updateContactList', function (param) {
+      //TEST:
+      console.log('I should update my Contact list from param:');
+      console.log(param);
+
       //if this broadcast update is for me
       if (param.forUser == user.name) {
-        user['contacts'] = param.contactNames;
+        user.contacts = param.contactNames;
         var ulContacts = document.querySelector('#contacts > ul');
 
         //Remove all contacts first
@@ -306,12 +323,46 @@
         }
 
         //add each contacts in the contacts array received
-        for (let i = 0; i < user.contacts.length; i++) {
+        for (let i = 0; i < param.contactNames.length; i++) {
           //TODO: Make good online indicator
-          ulContacts.innerHTML += '<li>' + ((param.onlineStatuses[i].isOnline) ? 'ONLINE: ' : 'OFFLINE: ') + param.contactNames[i] + '</li>';
-
+          var newLi = document.createElement('li');
+          newLi.id = param.contactNames[i];
+          newLi.className += ' clickContact ';
+          newLi.textContent = ((param.onlineStatuses[i].isOnline) ? 'ONLINE: ' : 'OFFLINE: ')  + param.contactNames[i];
+          newLi.addEventListener('click', (e)=>{
+            //FOCUS1
+            //Populate the messages
+            //by first showing the name of person to talk to
+            document.getElementById('personToTalkTo').innerText = param.contactNames[i];
+            //then setting the send buttons' data-sendTo value 
+            document.getElementById('send').dataset['sendTo'] = param.contactNames[i];
+            //then showing the messaging area
+            document.getElementById('divMessaging').style.visibility = 'visible';
+            //and request information of conversation history with the person to talk to
+            socket.emit('clientAskForConversationHistory', {clientName: user.name, conversationWith: param.contactNames[i]} );
+          });
+          ulContacts.appendChild(newLi);
         }
       }
+    });
+
+    //FOCUSa
+    //SCOPE: Send button functionality
+    //Add functionality to send button by
+    //finding the button first and the message and the person toTalkto
+    var buttSend = document.getElementById('send');
+    var messageToSend = document.getElementById('messageToSend').value;
+    var personToTalkTo = buttSend.dataset['sendTo'];
+
+    //then add event listener so that when clicked
+    buttSend.addEventListener('click', (e)=>{
+      //it will tell the server to send the messageToSend from the client
+      //to the person to talkto
+      socket.emit('clientSendMessageTo', {messageToSend: messageToSend, sendTo: personToTalkTo});
+      
+      //TEST:
+      socket.emit('clientMessage', 'Hey server send this message to someone from me:');
+      socket.emit('clientMessage', {messageToSend: messageToSend, sendTo: personToTalkTo});
     });
 
 
