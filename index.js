@@ -6,13 +6,14 @@ const { response } = require('express');
 const { request } = require('http');
 const chatUser = require('./chatUser');
 const onlineStatus = require('./onlineStatus');
-const Message = require('./message');
+const message = require('./message');
+
 // var findUser = null;
 
 //Array of all users
 var allChatUsers = [];
 var socketIDAndUserName = new Object();
-
+var conversations = [];
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -143,24 +144,48 @@ io.on('connection', (socket) => {
   
   //SCOPE: clientSendMessageTo
   socket.on('clientSendMessageTo', (param)=>{
-    //FOCUS3
-    //Accept the client message request by
-    //finding the client from all the user via socketID?
-    //then //TRY SUBMIT BUTT FIRST
+    var messageObj = new message(param.sender, param.message, param.sendTo);
+
+    //DONE: Accept the client message request by
+    //finding the client from all the user
+    var findUser = allChatUsers.filter(e => e.name == param.sender);
+    //then add it to the conversations list
+
+    //FOCUS every push must update the two talking person
+    conversations.push(messageObj);
+    // addToConversations(messageObj);//Make a general function for trigger
+
+    //then update the client about all its messages to the person of interest
+    socket.emit('updateConversationHistory', returnAllConversationsOfAAndB(param.sender, param.sendTo));
+
+    //TEST
+    // console.log(conversations);
+    //TEST
+    //Send all the messages
   });
   
+  function returnAllConversationsOfAAndB(a , b){
+    //DONE Filter out and only return conversations with a and b
+    var toReturn =  conversations.filter((eachMessage) => 
+    {
+      if((eachMessage.sender == a || eachMessage.sender == b) && (eachMessage.receiver == a || eachMessage.receiver == b))
+      {
+        return eachMessage;
+      } 
+    });
+
+    return toReturn;
+    //TEST
+    // console.log("AB func convo filter result");
+    // console.log(toReturn);
+    // console.log("return all the conversations");
+    // console.log(conversations);
+  }
+
   //SCOPE: clientAskForConversationHistory 
   socket.on('clientAskForConversationHistory', (param)=>{
-    //FOCUS2
-    //Send back the data by
-    //knowing first the client and the personToTalkTo
-    //then find the client if exist in all Users list
-    //then getting the conversation data with personToTalkTo
-    //then send it back 
-
-    //TEST: 
-    //Try sending a fake data
-
+    //UNFIN totest
+    socket.emit('updateConversationHistory', returnAllConversationsOfAAndB(param.clientName, param.conversationWith));
   });
 
   //SCOPE: add to contact of current user

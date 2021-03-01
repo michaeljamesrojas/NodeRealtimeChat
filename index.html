@@ -73,10 +73,10 @@
       min-height: 100%;
       display: grid;
       grid-template-columns: 1fr 2fr 1fr;
-      grid-template-areas: 
-      'headr headr headr'
-      'contacts mainFunction global'
-      'footr footr footr';
+      grid-template-areas:
+        'headr headr headr'
+        'contacts mainFunction global'
+        'footr footr footr';
     }
 
     header {
@@ -105,6 +105,16 @@
 
     .clickContact:hover {
       background-color: rgba(255, 0, 0, 0.363);
+    }
+
+    .fromYou {
+      text-align: right;
+      background-color: rgba(0, 128, 0, 0.253);
+    }
+
+    .notFromYou {
+      text-align: left;
+      background-color: rgba(255, 255, 0, 0.267);
     }
   </style>
 </head>
@@ -156,7 +166,7 @@
           <div class='notFromYou'>Haha, BTW, how are you?</div>
         </div>
         <div id="divMessageComposer">
-          <input id= 'messageToSend' type="text">
+          <input id='messageToSend' type="text">
           <button id="send">SEND</button>
         </div>
       </div>
@@ -197,7 +207,7 @@
     var inputMessageToSend = document.getElementById('messageToSend');
     var buttSend = document.getElementById('send');
 
-    
+
 
     //SCOPE: DEFAULT FUNCTIONALITY FORM SUBMIT
     form.addEventListener('submit', function (e) {
@@ -222,13 +232,83 @@
       socket.emit('signUp', user);
     });
 
+    //SCOPE: Send button functionality
+    //Add functionality to send button by
+    //adding event listener so that when clicked
+    buttSend.addEventListener('click', (e) => {
+      //find the message and the person toTalkto first
+      var elemMessageToSend = document.getElementById('messageToSend')
+      var messageToSend = elemMessageToSend.value;
+      //Do all of this only if messageToSend is not empty
+      if (messageToSend != '') {
+        //Empty the input
+        elemMessageToSend.value = "";//TODO:Please USE FORM SUBMISSION INSTEAD
+
+        var personToTalkTo = buttSend.dataset['sendTo'];
+
+        //then it will tell the server to send the messageToSend from the client
+        //to the person to talkto
+        socket.emit('clientSendMessageTo', { sender: user.name, message: messageToSend, sendTo: personToTalkTo });
+
+        //TEST:
+        socket.emit('clientMessage', 'Hey server send this message to someone from me:');
+        socket.emit('clientMessage', { message: messageToSend, sendTo: personToTalkTo });
+      }
+    });
 
     //SCOPE: show login functionality
     socket.on('showLogIn', () => {
       divAuthenticationBG.style.visibility = "visible";
     });
     
-    
+    //SCOPE: General socket functionality
+    socket.on('sendThisAsEmitBackToMeMyClient', (param) => {
+      socket.emit(param);
+    });
+
+
+    //SCOPE: updateConversationHistory
+    socket.on('updateConversationHistory', (messages) => {
+      //Exit immediately if convo received is not related to person currently of interest
+      if (messages.length > 0) {//Check if not empty
+        //then check if Person of interest is not related to convo data received, if so exit
+        var personInterest = buttSend.dataset['sendTo'];
+        if (messages.filter((m) => ((m.sender == personInterest && m.receiver == user.name) || (m.sender == user.name && m.receiver == personInterest))).length <= 0) {
+          return;
+        }
+      }
+
+      var divConversation = document.getElementById('divConversation');
+
+      //Update convo history by clearing it first then
+      while (divConversation.hasChildNodes()) {
+        divConversation.removeChild(divConversation.firstChild);
+      }
+
+      //Add each message in received convo from server by 
+      //iterating to each messages in convo param then
+      messages.forEach(message => {
+        //creating the necessary element as message
+        var divMessage = document.createElement('div');
+        divMessage.innerText = message.message;
+        //and setting the class approriately by
+        //checking if it is from client itself
+        if (message.sender == user.name) {
+          divMessage.className += 'fromYou';
+        } else {
+          divMessage.className += 'notFromYou';
+        }
+
+        //then appending it to the parent element for messaging
+        divConversation.appendChild(divMessage);
+      });
+
+      //TEST:
+      console.log('convo history received from server:');
+      console.log(messages);
+    });
+
+
 
     //SCOPE: alert client functionality
     socket.on('alertUser', function (alertMessage) {
@@ -255,19 +335,19 @@
         //TODO: Better Online indicator
         //If online/offline then add indicator
         newLi.textContent = ((eachUser.isOnline) ? 'ONLINE: ' : 'OFFLINE: ') + eachUser.name;
-        
-        
+
+
         //DONE: excluding self from displaying on global
         if (eachUser.name != user.name) {
           ulGlobalOnline.appendChild(newLi);
 
           //Add button to add contact if not in contacts yet if of course contacts is not undefined also
-          if (user.contacts != undefined &&  !user.contacts.includes(eachUser.name)) {
+          if (user.contacts != undefined && !user.contacts.includes(eachUser.name)) {
             newButton.innerText = "+";
             // newButton.dataset['username'] = eachUser.name;
             newButton.addEventListener('click', (param) => {
               socket.emit("addToContacts", { currentUserName: user.name, addToContact: eachUser.name });
-              
+
               //TEST:
               // socket.emit("clientMessage", "contact request friend");
             });
@@ -328,9 +408,8 @@
           var newLi = document.createElement('li');
           newLi.id = param.contactNames[i];
           newLi.className += ' clickContact ';
-          newLi.textContent = ((param.onlineStatuses[i].isOnline) ? 'ONLINE: ' : 'OFFLINE: ')  + param.contactNames[i];
-          newLi.addEventListener('click', (e)=>{
-            //FOCUS1
+          newLi.textContent = ((param.onlineStatuses[i].isOnline) ? 'ONLINE: ' : 'OFFLINE: ') + param.contactNames[i];
+          newLi.addEventListener('click', (e) => {
             //Populate the messages
             //by first showing the name of person to talk to
             document.getElementById('personToTalkTo').innerText = param.contactNames[i];
@@ -339,31 +418,14 @@
             //then showing the messaging area
             document.getElementById('divMessaging').style.visibility = 'visible';
             //and request information of conversation history with the person to talk to
-            socket.emit('clientAskForConversationHistory', {clientName: user.name, conversationWith: param.contactNames[i]} );
+            socket.emit('clientAskForConversationHistory', { clientName: user.name, conversationWith: param.contactNames[i] });
           });
           ulContacts.appendChild(newLi);
         }
       }
     });
 
-    //FOCUSa
-    //SCOPE: Send button functionality
-    //Add functionality to send button by
-    //finding the button first and the message and the person toTalkto
-    var buttSend = document.getElementById('send');
-    var messageToSend = document.getElementById('messageToSend').value;
-    var personToTalkTo = buttSend.dataset['sendTo'];
 
-    //then add event listener so that when clicked
-    buttSend.addEventListener('click', (e)=>{
-      //it will tell the server to send the messageToSend from the client
-      //to the person to talkto
-      socket.emit('clientSendMessageTo', {messageToSend: messageToSend, sendTo: personToTalkTo});
-      
-      //TEST:
-      socket.emit('clientMessage', 'Hey server send this message to someone from me:');
-      socket.emit('clientMessage', {messageToSend: messageToSend, sendTo: personToTalkTo});
-    });
 
 
     //SCOPE: DEFAULT FUNCTIONALITY AS BASIS

@@ -10,7 +10,6 @@ class chatUser {
         this.contacts = new Array();
         this.isOnline = false;
         this.notifications = new Object();//TODO: Make this a class please
-        this.conversationsWith = new Map();//TODO: Make this a class please
         //TEST:
         //Make a callback function
         // this.addConversation
