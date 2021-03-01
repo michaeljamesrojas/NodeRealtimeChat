@@ -71,7 +71,7 @@
 </head>
 
 <body>
-  <div id="divAuthenticationBG">
+  <div id="divAuthenticationBG" style="visibility: hidden;">
     <div id="divAuthentication">
       <!-- <div id="divUserFields"> -->
       <!-- TODO: Make input verification using form submission -->
@@ -98,30 +98,30 @@
     <header>
       <p>Welcome </p>
     </header>
-
+    
     <main>
       <div id="contacts">
         <h3>Contacts</h3>
         <ul>
-          <li>asdafafasfas</li>
-          <li>asdafafasfas</li>
-          <li>asdafafasfas</li>
-          <li>asdafafasfas</li>
-          <li>asdafafasfas</li>
-          <li>asdafafasfas</li>
+          <li>Sample List</li>
+          <li>Sample List</li>
         </ul>
       </div>
       <div id="globalOnline">
         <H3>Find Contacts Global</H3>
         <ul>
-
+          <li>Sample List</li>
+          <button>+</button>
+          <li>Sample List</li>
+          <button>+</button>
+          
         </ul>
         
       </div>
       <div id=""></div>
     </main>
 
-    <footer>Developed by: MichaelJamesRojas</footer>
+    <footer>© 2021 Michael James Rojas</footer>
   </div>
 
 
@@ -140,7 +140,7 @@
     var inputName = document.getElementById('inputName');
     var inputPass = document.getElementById('inputPass');
     var divAuthenticationBG = document.getElementById('divAuthenticationBG');
-    var user;
+    var user = {name:'', password:'', contacts:[]};
 
     //SCOPE: DEFAULT FUNCTIONALITY FORM SUBMIT
     form.addEventListener('submit', function (e) {
@@ -153,16 +153,24 @@
 
     //SCOPE: LOGIN BUTTON FUNCTIONALITY
     buttLogIn.addEventListener("click", (e) => {
-      user = { name: inputName.value, password: inputPass.value };
+      user['name'] = inputName.value;
+      user['password'] = inputPass.value;
       socket.emit('logIn', user);
     });
     
     //SCOPE: SIGNUP BUTTON FUNCTIONALITY
     buttonSignUp.addEventListener("click", (e) => {
-      user = { name: inputName.value, password: inputPass.value };
+      user['name'] = inputName.value;
+      user['password'] = inputPass.value;
       socket.emit('signUp', user);
     });
     
+
+
+    //SCOPE: show login functionality
+    socket.on('showLogIn', ()=> {
+      divAuthenticationBG.style.visibility = "visible";
+    });
 
     //SCOPE: alert client functionality
     socket.on('alertUser', function (alertMessage) {
@@ -185,14 +193,25 @@
       //DONE: Add each names in list
       allUser.forEach(eachUser => {
         var newLi = document.createElement('li');
+        var newButton = document.createElement('button');
         //TODO: Better Online indicator
-        //If onlineStatus Array is not empty then online
+        //If online/offline then add indicator
         newLi.textContent = ((eachUser.isOnline)?'ONLINE: ':'OFFLINE: ' ) + eachUser.name;
         
+        //Add button to add contact if not in contacts yet
+        newButton.innerText = "+";
+        // newButton.dataset['username'] = eachUser.name;
+        newButton.addEventListener('click', (param)=>{
+          socket.emit("addToContacts", {currentUserName: user.name, addToContact: eachUser.name});
+          
+          //TEST:
+          // socket.emit("clientMessage", "contact request friend");
+        });
+
         //DONE: excluding self
         if(eachUser.name != user.name){
           ulGlobalOnline.appendChild(newLi);
-
+          ulGlobalOnline.appendChild(newButton);
         }
       });
     });
@@ -203,13 +222,43 @@
     });
 
     //SCOPE: Redirect MAIN PAGE functionality
-    socket.on('redirectMainPage', function () {
+    socket.on('redirectMainPage', function (name) {
       divAuthenticationBG.style.visibility = "hidden";
+      document.querySelector('header > p').innerText = "Welcome " + name;
     });
     
     //SCOPE: Update user header functionality
     socket.on('updateUserHeader', function (name) {
       document.querySelector("header > p").innerText = name;
+    });
+    
+    //SCOPE: request an update if someones status change has impact on current user
+    socket.on('someoneChangedStatus', function (name) {
+      //If that someone is in my contacts or that's me then update my contacts
+      if (user.contacts.includes(name) || user.name == name) {
+        socket.emit('clientRequestUpdateContact', user.name);
+      }
+    });
+    
+    //SCOPE: Update contacts list
+    socket.on('updateContactList', function (param) {
+      //if this broadcast update is for me
+      if (param.forUser == user.name) {
+        user['contacts'] = param.contactNames;
+        var ulContacts = document.querySelector('#contacts > ul');
+
+        //Remove all contacts first
+        while (ulContacts.hasChildNodes()) {
+          ulContacts.removeChild(ulContacts.firstChild);
+        }
+
+        //add each contacts in the contacts array received
+        for (let i = 0; i < user.contacts.length; i++) {
+          //TODO: Make good online indicator
+          ulContacts.innerHTML += '<li>' + ((param.onlineStatuses[i].isOnline) ? 'ONLINE: ' : 'OFFLINE: ') + param.contactNames[i] + '</li>';
+
+        }
+      }
     });
 
 

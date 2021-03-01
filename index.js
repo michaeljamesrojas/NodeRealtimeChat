@@ -20,23 +20,43 @@ app.get('/', (req, res) => {
 //SCOPE: CONNECTION
 io.on('connection', (socket) => {
   console.log('a user connected');
-  
+
+  socket.emit('showLogIn');
+
   //SCOPE: FUNCTIONS
   //SCOPE: Update client contacts list
-  function updateClientContacts() {
-    
-
-  }
 
   function updateGlobalUsers() {
     io.emit('updateGlobal', allChatUsers.map(a =>  { 
-      return {name: a.name, isOnline: a.isOnline};//Send only name and online status
+      //Send only name and online status
+      return {name: a.name, isOnline: a.isOnline};
     }));
 
     // TEST:
     // console.log(allChatUsers.map(a => a.name));
   }
 
+  //SCOPE: Update contact list of user
+  function updateContactList(username){
+    var findUser = allChatUsers.filter(chatUser => chatUser.name == username);
+
+    var contacts = findUser[0].contacts;
+    //DONE: get the contact names of this username and their corresponding online statuses
+    var param = {forUser:username, contactNames: contacts, 
+      onlineStatuses:
+      allChatUsers.map(a =>  { 
+        //DONE: Send only name and online status
+        if(contacts.includes(a.name)){
+          return {isOnline: a.isOnline};
+        }
+      }).filter(a=>a != undefined)//DONE: remove undefine resulting map array
+      
+    };
+    //Send only the list of contacts and their status
+    io.emit('updateContactList', param);
+  }
+
+  //SCOPE: socket deleter from list
   function deleteSocketIDForOnlineStatus(socketID){
 
     // get username of disconnecting socket
@@ -52,24 +72,37 @@ io.on('connection', (socket) => {
     
   }
   
+  //SCOPE: socket to username relation adder
   function addSocketIDandUserNameForOnlineStatus(socketIDToAdd, name){
     socketIDAndUserName[socketIDToAdd.toString()] = name;
 
     updateUsersOnlineStatus(name);
   }
 
+  //SCOPE: Update user online status
   function updateUsersOnlineStatus(name){
     var findUser = allChatUsers.filter(e => e.name == name);
     
     //Look if name is found in socketIDAndUserName list, if found
     if(Object.values(socketIDAndUserName).includes(name)){
       //then user is online
-      allChatUsers[allChatUsers.indexOf(findUser[0])].isOnline = true;
+      // allChatUsers[allChatUsers.indexOf(findUser[0])].isOnline = true;
+      findUser[0].isOnline = true;
     }
     else{//offline
-      allChatUsers[allChatUsers.indexOf(findUser[0])].isOnline = false;
+      // allChatUsers[allChatUsers.indexOf(findUser[0])].isOnline = false;
+      findUser[0].isOnline = false;
     }
+
+    //DONE Broadcast users online status and broadcast global changed
+    broadcastUserStatusChanged(name);
+    updateGlobalUsers();
   }
+
+  function broadcastUserStatusChanged(name){
+    io.emit('someoneChangedStatus', name);
+  }
+  
 
   //SCOPE: SOCKETS
   //SCOPE: DISCONNECTED
@@ -77,22 +110,30 @@ io.on('connection', (socket) => {
     //DONE: update online status via socket id
     deleteSocketIDForOnlineStatus(socket.id);
     
-    updateGlobalUsers();
-    
     //TEST:
     // io.emit('alertUser', "someone disconnected soc ID: " + socket.id );
   });
 
-
-  //SCOPE: All in one client update
-  function updateUserPage() {//FOCUS4
-    updateClientContacts();
-    updateGlobalUsers();
-  }
-
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+  //SCOPE: clientRequestUpdateContact
+  socket.on('clientRequestUpdateContact', (name)=>{
+    updateContactList(name);
   });
+
+  //SCOPE: add to contact of current user
+  socket.on('addToContacts', (param) => {
+    var findUser = allChatUsers.filter(e => (e.name == param.currentUserName) );
+    //DONE: add to contacts of current user if not already added
+    if (!findUser[0].contacts.includes(param.addToContact)){
+      findUser[0].contacts.push(param.addToContact);
+    }
+    
+    updateContactList(param.currentUserName);
+    
+    //TEST:
+    console.log(param);
+  });
+
+
 
   //SCOPE client message to server
   socket.on('clientMessage', (message) =>{
@@ -111,9 +152,8 @@ io.on('connection', (socket) => {
       socket.emit('alertUser', "Username: '" + userInfo.name + "' already taken.");
     }
     else {
-
       //Create new user object
-      var newUser = new chatUser(userInfo.name, userInfo.password, []);
+      var newUser = new chatUser(userInfo.name, userInfo.password);
       allChatUsers.push(newUser);
       
       socket.emit('alertUser', "You have succesfully signed up");
@@ -124,7 +164,7 @@ io.on('connection', (socket) => {
       
 
       //TEST:
-      console.log({ currentUser: newUser, allUser: allChatUsers });
+      // console.log({ currentUser: newUser, allUser: allChatUsers });
       // console.log(allChatUsers);
 
     }
@@ -147,11 +187,10 @@ io.on('connection', (socket) => {
         //Update current users online status object
         addSocketIDandUserNameForOnlineStatus(socket.id, findUser[0].name);
 
-        socket.emit('redirectMainPage');
-        updateUserPage();//FOCUS 3
+        socket.emit('redirectMainPage', findUser[0].name);
 
         //TEST:
-        console.log({ currentUser: findUser[0], allUser: allChatUsers });
+        // console.log({ currentUser: findUser[0], allUser: allChatUsers });
         // console.log(allChatUsers);
       } else {
         socket.emit('alertUser', "Incorrect password for user " + userInfo.name);
