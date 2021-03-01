@@ -282,5 +282,5 @@ io.on('connection', (socket) => {
 //Port listening
 const port = process.env.PORT;
 http.listen(port || 3000, () => {
-  console.log('Server started. Listening on port:' + process.env.PORT);
+  console.log('Server started. Listening on port: 3000');
 });
