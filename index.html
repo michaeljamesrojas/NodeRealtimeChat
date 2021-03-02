@@ -408,7 +408,7 @@
           //TODO: Make good online indicator
           var newLi = document.createElement('li');
           newLi.id = param.contactNames[i];
-          newLi.className += ' clickContact ';
+          newLi.className += ' clickContact '; 
           newLi.textContent = ((param.onlineStatuses[i].isOnline) ? 'ONLINE: ' : 'OFFLINE: ') + param.contactNames[i];
           newLi.addEventListener('click', (e) => {
             //Populate the messages

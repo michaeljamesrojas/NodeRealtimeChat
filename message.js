@@ -6,4 +6,4 @@ class message {
     }
 }
 
-module.exports = message;
+module.exports = message; 
