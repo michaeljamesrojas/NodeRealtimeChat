@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
     
     //TEST
     console.log('finduser result for request of client: ' + username);
-    console.log(findUser);
+    console.log(findUser); 
 
     var contacts = findUser[0].contacts; 
     //DONE: get the contact names of this username and their corresponding online statuses
