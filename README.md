@@ -11,15 +11,16 @@ Features:
 
 
 TODO:
-1. Log in by Google.
-2. Actual database implementation.
-3. or file operation while not databased.
-4. Optimized socket operations for good server performance.
+- Log in by Google.
+- Actual database implementation.
+- or file operation while not databased.
+- Optimized socket operations for good server performance.
+- Optimized code to allow high scalability of the app (TIP: Use UML design).
 
 TO FIX:
 
 TO ADD: 
-1. Notifications
+- Notifications
 
 
 NOTE:
@@ -39,3 +40,8 @@ The
 FOCUS: 
 markdown are numbered sometimes to give priority,
 higher number gives higher priority.
+
+
+
+
+© 2021 Michael James Rojas
