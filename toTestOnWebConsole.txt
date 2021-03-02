@@ -1,0 +1,40 @@
+class chatUser {
+    constructor(name, password) {
+        //NOTE: TEMPORARY ID GENERATOR
+        this.id = new Date().getTime();
+        this.name = name;
+        this.password = password;
+        this.contacts = new Array(); 
+        this.isOnline = false;
+        this.notifications = new Object();//TODO: Make this a class please
+        //TEST:
+        //Make a callback function
+        // this.addConversation
+        // this.onlineStatus = new onlineStatus();
+    }
+}
+
+var allChatUsers = [];
+allChatUsers.push(new chatUser('qwe','qwe'));
+allChatUsers.push(new chatUser('asd','asd'));
+allChatUsers.push(new chatUser('zxc','zxc'));
+
+var contacts = [];
+contacts.push('qwe');
+contacts.push('zxc');
+
+var contactStatuses;
+
+contactStatuses = contacts.map((contactName) => {
+    //and look for object in all the chatUsers list //O(n) Algorithm
+    return (
+    allChatUsers.filter((chatUser) => chatUser.name == contactName).map(
+        (aloneChatUser) => {
+        //and return only the status property
+        return { isOnline: aloneChatUser.isOnline };
+        //   //FOCUS A1: contacts status
+    })
+    );
+}, allChatUsers);
+
+

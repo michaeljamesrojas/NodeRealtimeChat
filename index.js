@@ -44,38 +44,62 @@ io.on('connection', (socket) => {
   }
 
   //SCOPE: Update contact list of user
-  function updateContactList(username){
-    
-    var findUser = allChatUsers.filter(chatUser => chatUser.name == username);
-    
-    //TEST
-    console.log('finduser result for request of client: ' + username);
-    console.log(findUser); 
+  function updateContactList(username) {
+    try {
 
-    var contacts = findUser[0].contacts; 
-    var contactStatuses = allChatUsers.map(a =>  { 
-      //FOCUSa1: contacts status
-      if(contacts.includes(a.name)){ 
-        return {isOnline: a.isOnline};
-      }
-    }).filter(a=>a != undefined)//DONE: remove undefine resulting map array 
+      var findUser = allChatUsers.filter(chatUser => chatUser.name == username);
 
-    //DONE: get the contact names of this username and their corresponding online statuses
-    var param = {forUser:username, contactNames: contacts, onlineStatuses: contactStatuses};
-    
-    //Send only the list of contacts and their status
-    //FOCUSa0: Try socket for best performance
-    io.emit('updateContactList', param);
+      //TEST
+      console.log('finduser result for request of client: ' + username);
+      console.log(findUser);
 
-    //Whenever someone update contacts then update global also
-    updateGlobalUsers();
+      var contacts = findUser[0].contacts;
 
-    //TEST:
-    console.log('This is in the server');
-    console.log(allChatUsers);
-    console.log('and this is to send');
-    console.log(param);
 
+      //TO TEST
+      var contactStatuses;
+      contactStatuses = contacts.map((contactName) => {
+        //and look for object in all the chatUsers list //O(n) Algorithm
+        return (
+          allChatUsers.filter((chatUser) => chatUser.name == contactName).map(
+            (aloneChatUser) => {
+              //and return only the status property
+              return { isOnline: aloneChatUser.isOnline };
+              //   //FOCUS A1: contacts status
+            })
+        )[0];//Get first element since only one element is always a result
+      }, allChatUsers);
+
+
+      // NOTE: To remove
+      // var contactStatuses = allChatUsers.map(a =>  { 
+      //   //FOCUSa1: contacts status
+      //   if(contacts.includes(a.name)){ 
+      //     return {isOnline: a.isOnline};
+      //   }
+      // }).filter(a=>a != undefined)//DONE: remove undefine resulting map array 
+
+
+      //DONE: get the contact names of this username and their corresponding online statuses
+      var param = { forUser: username, contactNames: contacts, onlineStatuses: contactStatuses };
+
+      //Send only the list of contacts and their status
+      //FOCUSa0: Try socket for best performance
+      io.emit('updateContactList', param);
+
+      //Whenever someone update contacts then update global also
+      updateGlobalUsers();
+
+      //TEST:
+      console.log('This is in the server');
+      console.log(allChatUsers);
+      console.log('and this is to send');
+      console.log(param);
+
+
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   //SCOPE: socket deleter from list
