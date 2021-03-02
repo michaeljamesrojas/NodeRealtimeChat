@@ -11,6 +11,7 @@ Features:
 
 
 TODO:
+- Improve UI (i.e. real-time-all-colors-theme-changing, div placements)
 - Log in by Google.
 - Actual database implementation.
 - or file operation while not databased.
