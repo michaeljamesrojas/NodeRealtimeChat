@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
       onlineStatuses:
       allChatUsers.map(a =>  { 
         //FOCUSa1: contacts status
-        if(contacts.includes(a.name)){
+        if(contacts.includes(a.name)){ 
           return {isOnline: a.isOnline};
         }
       }).filter(a=>a != undefined)//DONE: remove undefine resulting map array
