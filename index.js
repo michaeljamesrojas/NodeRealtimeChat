@@ -10,10 +10,10 @@ const message = require('./message');
 
 // var findUser = null;
 
-//Array of all users
-var allChatUsers = [];
-var socketIDAndUserName = new Object();
-var conversations = [];
+var allChatUsers = [];//Array of all users
+var socketIDAndUserName = new Object();//ForOnlineStatuses
+var conversations = [];//Array of message objects for all conversations
+
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -53,17 +53,16 @@ io.on('connection', (socket) => {
     console.log(findUser); 
 
     var contacts = findUser[0].contacts; 
+    var contactStatuses = allChatUsers.map(a =>  { 
+      //FOCUSa1: contacts status
+      if(contacts.includes(a.name)){ 
+        return {isOnline: a.isOnline};
+      }
+    }).filter(a=>a != undefined)//DONE: remove undefine resulting map array 
+
     //DONE: get the contact names of this username and their corresponding online statuses
-    var param = {forUser:username, contactNames: contacts, 
-      onlineStatuses:
-      allChatUsers.map(a =>  { 
-        //FOCUSa1: contacts status
-        if(contacts.includes(a.name)){ 
-          return {isOnline: a.isOnline};
-        }
-      }).filter(a=>a != undefined)//DONE: remove undefine resulting map array
-      
-    };
+    var param = {forUser:username, contactNames: contacts, onlineStatuses: contactStatuses};
+    
     //Send only the list of contacts and their status
     //FOCUSa0: Try socket for best performance
     io.emit('updateContactList', param);

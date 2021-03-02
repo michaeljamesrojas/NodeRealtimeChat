@@ -1,12 +1,18 @@
 # NodeRealtimeChat
 A simple Node JS Realtime time chat webapp.
 
-
 TODO:
 1. Log in by Google.
 2. Actual database implementation.
 3. or file operation while not databased.
 4. Optimized socket operations for good server performance.
+
+TO FIX:
+1. Shuffled online statuses for contacts
+
+TO ADD:
+1. Realtime update for the conversation of message receiver if online.
+
 
 NOTE:
 Markdowns in the code such as 
