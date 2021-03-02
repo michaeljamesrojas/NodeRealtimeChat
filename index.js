@@ -52,7 +52,7 @@ io.on('connection', (socket) => {
     console.log('finduser result for request of client: ' + username);
     console.log(findUser);
 
-    var contacts = findUser[0].contacts;
+    var contacts = findUser[0].contacts; 
     //DONE: get the contact names of this username and their corresponding online statuses
     var param = {forUser:username, contactNames: contacts, 
       onlineStatuses:
