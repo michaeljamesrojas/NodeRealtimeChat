@@ -65,19 +65,9 @@ io.on('connection', (socket) => {
             (aloneChatUser) => {
               //and return only the status property
               return { isOnline: aloneChatUser.isOnline };
-              //   //FOCUS A1: contacts status
             })
         )[0];//Get first element since only one element is always a result
       }, allChatUsers);
-
-
-      // NOTE: To remove
-      // var contactStatuses = allChatUsers.map(a =>  { 
-      //   //FOCUSa1: contacts status
-      //   if(contacts.includes(a.name)){ 
-      //     return {isOnline: a.isOnline};
-      //   }
-      // }).filter(a=>a != undefined)//DONE: remove undefine resulting map array 
 
 
       //DONE: get the contact names of this username and their corresponding online statuses
@@ -101,6 +91,7 @@ io.on('connection', (socket) => {
       console.log(error)
     }
   }
+
 
   //SCOPE: socket deleter from list
   function deleteSocketIDForOnlineStatus(socketID){
@@ -173,29 +164,51 @@ io.on('connection', (socket) => {
     //DONE: Accept the client message request by
     //finding the client from all the user
     var findUser = allChatUsers.filter(e => e.name == param.sender);
-    //then add it to the conversations list
+    
+    //then add it to the conversations list, and update the clients convo of sender and receiver
+    addToConversations(messageObj);
 
-    //FOCUSc0: every push must update the two talking person
-    conversations.push(messageObj);
-    // addToConversations(messageObj);
-
-    //then update the client about all its messages to the person of interest
-    socket.emit('updateConversationHistory', returnAllConversationsOfAAndB(param.sender, param.sendTo));
-
-    //TEST
+    // //TEST
     // console.log(conversations);
-    //TEST
-    //Send all the messages
   });
   
   function addToConversations(messageObj){
     conversations.push(messageObj);
-    //FOCUSc1: update the talking
     //Everytime a message is added to conversations
-    //Tell the messageSender and receiver to send a request for an update of their history from the server
-    //do this by broadcasting it with the name attached for them to react accordingly
-    io.emit('makeAConvoRequestIfItsYou', messageObj.sender);
-    io.emit('makeAConvoRequestIfItsYou', messageObj.receiver);
+    //Send the conversation update only to the messageSender and receiver  
+    //do this by GETTING all the socket ID belonging to messageSender and receiver as array
+    //by getting the entries of socketIDAndUserName obj and filter out those that contains 
+    //the name of sender or receiver then lastly get the keys of resulting object
+    var socketIDsOfSenderAndReceiver;
+    
+    socketIDsOfSenderAndReceiver = Object.keys(
+      Object.fromEntries(
+        Object.entries(socketIDAndUserName).filter
+        ((eachEntry)=>
+          (
+            eachEntry.includes(messageObj.sender) || eachEntry.includes(messageObj.receiver)
+          )
+        )
+      )
+    );
+
+    //Get the coversations of sender and receiver first 
+    var conversationsOfSenderAndReceiver = returnAllConversationsOfAAndB(messageObj.sender, messageObj.receiver);
+    //then emit foreach ID in the array the conversations between sender and receiver
+    socketIDsOfSenderAndReceiver.forEach(eachID => {
+      io.to(eachID).emit('updateConversationHistory', conversationsOfSenderAndReceiver);   
+      
+      //TEST 
+      io.to(eachID).emit('alertUser', "You are the receiver or sender right?");   
+    });
+
+    // //UNFIN Why remove this? then remove also client
+    // io.emit('makeAConvoRequestIfItsYou', messageObj.sender);
+    // io.emit('makeAConvoRequestIfItsYou', messageObj.receiver);
+
+    //TEST
+    console.log('Socket IDS of sender and receiver');
+    console.log(socketIDsOfSenderAndReceiver);
   }
 
   function returnAllConversationsOfAAndB(a , b){

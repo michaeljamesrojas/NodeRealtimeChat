@@ -32,7 +32,6 @@ contactStatuses = contacts.map((contactName) => {
         (aloneChatUser) => {
         //and return only the status property
         return { isOnline: aloneChatUser.isOnline };
-        //   //FOCUS A1: contacts status
     })
     );
 }, allChatUsers);

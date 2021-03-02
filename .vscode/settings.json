@@ -1,3 +1,4 @@
 {
-    "todo-tree.tree.disableCompactFolders": true
+    "todo-tree.tree.disableCompactFolders": false,
+    "todo-tree.tree.showCountsInTree": true
 }
