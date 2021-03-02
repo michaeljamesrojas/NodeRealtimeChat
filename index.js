@@ -14,7 +14,7 @@ var allChatUsers = [];//Array of all users
 var socketIDAndUserName = new Object();//ForOnlineStatuses
 var conversations = [];//Array of message objects for all conversations
 
-
+ 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });

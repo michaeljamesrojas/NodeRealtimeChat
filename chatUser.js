@@ -7,7 +7,7 @@ class chatUser {
         this.id = new Date().getTime();
         this.name = name;
         this.password = password;
-        this.contacts = new Array();
+        this.contacts = new Array(); 
         this.isOnline = false;
         this.notifications = new Object();//TODO: Make this a class please
         //TEST:

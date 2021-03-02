@@ -10,7 +10,7 @@ TODO:
 TO FIX:
 1. Shuffled online statuses for contacts
 
-TO ADD:
+TO ADD: 
 1. Realtime update for the conversation of message receiver if online.
 
 
