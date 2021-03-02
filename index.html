@@ -421,7 +421,7 @@
             //and request information of conversation history with the person to talk to
             socket.emit('clientAskForConversationHistory', { clientName: user.name, conversationWith: param.contactNames[i] });
           });
-          ulContacts.appendChild(newLi);
+          ulContacts.appendChild(newLi); 
         }
       }
     });
