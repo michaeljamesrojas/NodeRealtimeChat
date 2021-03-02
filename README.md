@@ -1,5 +1,14 @@
 # NodeRealtimeChat
-A simple Node JS Realtime time chat webapp.
+A simple Node JS Realtime chat webapp.
+
+Features:
+> Basic account functionality (Login, SignUp).
+> Online status indicator.
+> Contacts list.
+> Global users list (for adding to contacts).
+> Chat with the person in contact.
+> Chat history for each conversation with contact.
+
 
 TODO:
 1. Log in by Google.
