@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
     var param = {forUser:username, contactNames: contacts, 
       onlineStatuses:
       allChatUsers.map(a =>  { 
-        //DONE: Send only name and online status
+        //FOCUSa: contacts status
         if(contacts.includes(a.name)){
           return {isOnline: a.isOnline};
         }
@@ -65,6 +65,7 @@ io.on('connection', (socket) => {
       
     };
     //Send only the list of contacts and their status
+    //FOCUSa0: Try socket for best performance
     io.emit('updateContactList', param);
 
     //Whenever someone update contacts then update global also
@@ -166,7 +167,7 @@ io.on('connection', (socket) => {
   
   function addToConversations(messageObj){
     conversations.push(messageObj);
-    //FOCUS7
+    //FOCUS update the talking
     //Everytime a message is added to conversations
     //Tell the messageSender and receiver to send a request for an update of their history from the server
     //do this by broadcasting it with the name attached for them to react accordingly
