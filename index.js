@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
 
 
       //TO TEST
-      var contactStatuses;
+      var contactStatuses;  
       contactStatuses = contacts.map((contactName) => {
         //and look for object in all the chatUsers list //O(n) Algorithm
         return (

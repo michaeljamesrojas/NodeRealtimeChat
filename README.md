@@ -8,7 +8,7 @@ TODO:
 4. Optimized socket operations for good server performance.
 
 TO FIX:
-1. Shuffled online statuses for contacts
+1. DONE: Shuffled online statuses for contacts
 
 TO ADD: 
 1. Realtime update for the conversation of message receiver if online.
